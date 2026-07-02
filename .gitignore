@@ -1,0 +1,10 @@
+.DS_Store
+BiliNote/
+
+video-analyzer/backend/.venv/
+video-analyzer/backend/data/
+video-analyzer/frontend/node_modules/
+video-analyzer/frontend/dist/
+
+__pycache__/
+*.pyc

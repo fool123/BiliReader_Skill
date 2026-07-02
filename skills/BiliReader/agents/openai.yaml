@@ -1,0 +1,4 @@
+interface:
+  display_name: "BiliReader"
+  short_description: "Analyze online and local videos from Codex"
+  default_prompt: "Use $bilireader to install BiliReader and summarize a video."
