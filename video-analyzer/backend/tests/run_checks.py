@@ -4,6 +4,7 @@ import tempfile
 from pathlib import Path
 from uuid import uuid4
 
+import os
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -15,6 +16,7 @@ from app.services import (
     FakeTranscriber,
     OpenAICompatibleSummarizer,
     TaskRunner,
+    YtDlpWhisperTranscriber,
     infer_platform,
 )
 from app.storage import Storage
@@ -99,9 +101,20 @@ def assert_platform_validation() -> None:
         raise AssertionError("unsupported URL should fail")
 
 
+def assert_bilibili_headers() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        os.environ["BILIREADER_BILIBILI_COOKIE"] = "SESSDATA=test"
+        headers = YtDlpWhisperTranscriber(Path(tmp))._bilibili_headers("https://www.bilibili.com/video/BVxxx/")
+        assert "Chrome" in headers["User-Agent"]
+        assert headers["Referer"].endswith("/BVxxx/")
+        assert headers["Cookie"] == "SESSDATA=test"
+        os.environ.pop("BILIREADER_BILIBILI_COOKIE", None)
+
+
 if __name__ == "__main__":
     assert_chunker()
     assert_task_flow_with_subtitle()
     assert_audio_fallback()
     assert_platform_validation()
+    assert_bilibili_headers()
     print("checks passed")

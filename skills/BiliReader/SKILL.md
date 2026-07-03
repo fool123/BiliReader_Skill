@@ -53,6 +53,9 @@ BILIREADER_REPO_URL="https://github.com/owner/repo.git" python scripts/bilireade
 - `BILIREADER_PORT`: backend port, defaults to `8787`.
 - `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL`: optional OpenAI-compatible summarizer settings.
 - `WHISPER_MODEL`: optional faster-whisper model, for example `tiny` or `base`.
+- `BILIREADER_BILIBILI_COOKIE`: optional Bilibili Cookie header for videos that require login or stronger anti-bot checks.
+- `BILIREADER_BILIBILI_COOKIE_FILE`: optional yt-dlp cookie file path, mainly for subtitle extraction.
+- `BILIREADER_USER_AGENT`: optional browser User-Agent override.
 
 ## API Reference
 

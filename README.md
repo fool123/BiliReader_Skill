@@ -45,6 +45,8 @@ export WHISPER_MODEL="tiny"
 export OPENAI_API_KEY="你的 API Key"
 export OPENAI_BASE_URL="https://api.openai.com/v1"
 export OPENAI_MODEL="gpt-4.1-mini"
+export BILIREADER_BILIBILI_COOKIE="可选的 Bilibili Cookie"
+export BILIREADER_BILIBILI_COOKIE_FILE="/path/to/cookies.txt"
 ```
 
 ## CLI 用法
@@ -137,5 +139,6 @@ curl http://127.0.0.1:8787/api/tasks/<task_id>/transcript
 
 - 首次运行 faster-whisper 会下载模型，耗时取决于网络。
 - 真实在线视频需要当前设备能访问目标网站。
-- 不做全局 pip/npm 安装，依赖都安装在运行时仓库的 `.venv`。
+- Bilibili 链接如遇 412、登录限制或风控，可配置 `BILIREADER_BILIBILI_COOKIE` 或 `BILIREADER_BILIBILI_COOKIE_FILE`。
+- 不做全局 pip/npm 安装，依赖都安装在运行时仓库的 `.venv`；后端会通过 `imageio-ffmpeg` 提供项目级 ffmpeg。
 - 后端路径模式只允许项目目录内媒体文件；任意本地文件请用 CLI 上传方式。

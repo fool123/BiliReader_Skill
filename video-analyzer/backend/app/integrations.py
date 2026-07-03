@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import tempfile
 from pathlib import Path
@@ -85,7 +86,11 @@ class YtDlpSubtitleProvider:
                 "outtmpl": outtmpl,
                 "quiet": True,
                 "noplaylist": True,
+                "http_headers": self._headers(),
             }
+            cookiefile = os.environ.get("BILIREADER_BILIBILI_COOKIE_FILE")
+            if cookiefile:
+                opts["cookiefile"] = cookiefile
             try:
                 with YoutubeDL(opts) as ydl:
                     ydl.extract_info(url, download=True)
@@ -97,6 +102,20 @@ class YtDlpSubtitleProvider:
                 if transcript and transcript.segments:
                     return transcript
         return None
+
+    def _headers(self) -> dict:
+        headers = {
+            "User-Agent": os.environ.get(
+                "BILIREADER_USER_AGENT",
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+            ),
+            "Referer": "https://www.bilibili.com/",
+        }
+        cookie = os.environ.get("BILIREADER_BILIBILI_COOKIE")
+        if cookie:
+            headers["Cookie"] = cookie
+        return headers
 
     def _parse_file(self, path: Path) -> Transcript | None:
         text = path.read_text(encoding="utf-8", errors="ignore")

@@ -169,3 +169,15 @@
 - 动作：在目标仓库提交并尝试推送到 GitHub。
 - 结果：目标仓库已创建提交 `6734632 Add BiliReader Codex skill`；HTTPS 推送失败，原因为本机无法读取 GitHub 用户凭据；SSH 检查确认 GitHub host key 后失败，原因为当前机器无可用 GitHub public key 权限。
 - 下一步：用户配置 GitHub HTTPS 凭据或 SSH key 后，继续执行 `git push origin main`。
+
+### 2026-07-03 20:52:25 CST
+
+- 动作：定位并修复知识库项目中 BiliReader 分析 Bilibili 视频失败的问题。
+- 结果：确认失败由三部分叠加导致：Python 3.14 `urllib` 默认 CA 不完整、Bilibili 首选 CDN `mcdn.bilivideo.cn:8082` 在当前环境对 Python TLS 握手返回 EOF、项目级 runtime 缺少 ffmpeg；已让 CLI 启动服务时自动注入 certifi，后端支持 Bilibili UA/Cookie/cookiefile、音频 baseUrl/backupUrl fallback 与流式下载，并新增 `imageio-ffmpeg` 项目级 ffmpeg 依赖。
+- 下一步：推送修复后，知识库项目执行 `bilireader.py install` 更新 runtime 依赖，再重启服务重试分析。
+
+### 2026-07-03 20:53:32 CST
+
+- 动作：提交并尝试推送 Bilibili 修复。
+- 结果：已创建提交 `95d9ffb Fix Bilibili audio fallback and cert handling`；`git push origin main` 仍因本机 GitHub HTTPS 凭据不可用失败。
+- 下一步：用户通过 GitHub Desktop 或配置 Git 凭据推送该提交后，知识库项目再更新 runtime。

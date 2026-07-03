@@ -90,6 +90,7 @@ def install(args: argparse.Namespace) -> int:
 def serve(args: argparse.Namespace) -> int:
     backend = require_backend()
     env = os.environ.copy()
+    set_default_cert(env)
     port = str(port_number())
     print(f"serving: http://127.0.0.1:{port}", file=sys.stderr)
     return subprocess.call(
@@ -224,6 +225,15 @@ def require_backend() -> Path:
 
 def python_bin() -> Path:
     return backend_dir() / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+
+
+def set_default_cert(env: dict[str, str]) -> None:
+    if env.get("SSL_CERT_FILE"):
+        return
+    cert = output([str(python_bin()), "-c", "import certifi; print(certifi.where())"])
+    if cert:
+        env["SSL_CERT_FILE"] = cert
+        env.setdefault("REQUESTS_CA_BUNDLE", cert)
 
 
 def run(cmd: list[str]) -> None:

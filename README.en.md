@@ -45,6 +45,8 @@ export WHISPER_MODEL="tiny"
 export OPENAI_API_KEY="your API key"
 export OPENAI_BASE_URL="https://api.openai.com/v1"
 export OPENAI_MODEL="gpt-4.1-mini"
+export BILIREADER_BILIBILI_COOKIE="optional Bilibili Cookie"
+export BILIREADER_BILIBILI_COOKIE_FILE="/path/to/cookies.txt"
 ```
 
 ## CLI Usage
@@ -137,5 +139,6 @@ Effect: returns JSON with `task_id`, `language`, `full_text`, and timestamped `s
 
 - The first faster-whisper run may download a model.
 - Online videos require network access to the target website.
-- Dependencies are installed into the runtime repo `.venv`, not globally.
+- For Bilibili 412, login-only videos, or anti-bot failures, set `BILIREADER_BILIBILI_COOKIE` or `BILIREADER_BILIBILI_COOKIE_FILE`.
+- Dependencies are installed into the runtime repo `.venv`, not globally; the backend uses `imageio-ffmpeg` for a project-level ffmpeg binary.
 - Backend path mode only accepts project-local media paths; use CLI upload for arbitrary local files.

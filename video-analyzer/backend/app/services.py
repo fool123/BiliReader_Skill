@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -184,7 +185,8 @@ class YtDlpWhisperTranscriber:
         bvid = self._bvid(url)
         if not bvid:
             raise RuntimeError("无法识别 Bilibili BV 号")
-        headers = {"User-Agent": "Mozilla/5.0", "Referer": "https://www.bilibili.com"}
+        page_url = f"https://www.bilibili.com/video/{bvid}/"
+        headers = self._bilibili_headers(page_url)
         view = self._json("https://api.bilibili.com/x/web-interface/view", {"bvid": bvid}, headers)
         cid = view.get("data", {}).get("cid")
         if not cid:
@@ -195,15 +197,29 @@ class YtDlpWhisperTranscriber:
             headers,
         )
         audio = (play.get("data", {}).get("dash", {}).get("audio") or [{}])[0]
-        audio_url = audio.get("baseUrl") or audio.get("base_url")
-        if not audio_url:
+        audio_urls = [
+            url
+            for url in [audio.get("baseUrl") or audio.get("base_url")]
+            + (audio.get("backupUrl") or audio.get("backup_url") or [])
+            if url
+        ]
+        if not audio_urls:
             raise RuntimeError("无法获取 Bilibili 音频流")
 
         raw = tmp / "audio.m4s"
         mp3 = tmp / "audio.mp3"
-        req = urllib.request.Request(audio_url, headers=headers)
-        with urllib.request.urlopen(req, timeout=60) as response:
-            raw.write_bytes(response.read())
+        last_error = None
+        for audio_url in audio_urls:
+            req = urllib.request.Request(audio_url, headers={**headers, "Range": "bytes=0-"})
+            try:
+                with urllib.request.urlopen(req, timeout=60) as response, raw.open("wb") as output:
+                    shutil.copyfileobj(response, output, 1024 * 1024)
+                last_error = None
+                break
+            except urllib.error.URLError as exc:
+                last_error = exc
+        if last_error is not None:
+            raise RuntimeError(f"Bilibili 音频下载失败：{last_error}") from last_error
         subprocess.run(
             [self._ffmpeg(), "-y", "-i", str(raw), "-vn", "-acodec", "libmp3lame", "-b:a", "64k", str(mp3)],
             check=True,
@@ -211,6 +227,21 @@ class YtDlpWhisperTranscriber:
             stderr=subprocess.DEVNULL,
         )
         return mp3
+
+    def _bilibili_headers(self, referer: str) -> dict:
+        headers = {
+            "User-Agent": os.environ.get(
+                "BILIREADER_USER_AGENT",
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+            ),
+            "Referer": referer,
+            "Accept": "*/*",
+        }
+        cookie = os.environ.get("BILIREADER_BILIBILI_COOKIE")
+        if cookie:
+            headers["Cookie"] = cookie
+        return headers
 
     def _json(self, base_url: str, params: dict, headers: dict) -> dict:
         req = urllib.request.Request(base_url + "?" + urllib.parse.urlencode(params), headers=headers)
@@ -226,7 +257,14 @@ class YtDlpWhisperTranscriber:
 
     def _ffmpeg(self) -> str:
         bundled = Path(sys.executable).with_name("ffmpeg")
-        return str(bundled) if bundled.exists() else "ffmpeg"
+        if bundled.exists():
+            return str(bundled)
+        try:
+            import imageio_ffmpeg
+
+            return imageio_ffmpeg.get_ffmpeg_exe()
+        except ImportError:
+            return "ffmpeg"
 
 
 def infer_platform(url: str, platform: str | None) -> str:
