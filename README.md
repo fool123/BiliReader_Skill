@@ -15,6 +15,23 @@ BiliReader 是一个给 Codex 使用的跨设备视频分析 Skill。它会从 G
 
 ## 安装
 
+### 在其他电脑从零安装
+
+```bash
+git clone https://github.com/fool123/BiliReader_CodexSkill.git
+cd BiliReader_CodexSkill
+mkdir -p ~/.codex/skills
+cp -R skills/BiliReader ~/.codex/skills/BiliReader
+```
+
+重启 Codex 或新开一个 Codex 会话，让 Skill 被重新发现。调用名：
+
+```text
+$bilireader
+```
+
+### 安装运行时
+
 把 Skill 放到 Codex Skill 目录：
 
 ```bash
@@ -83,6 +100,18 @@ python ~/.codex/skills/BiliReader/scripts/bilireader.py note <task_id>
 python ~/.codex/skills/BiliReader/scripts/bilireader.py transcript <task_id>
 ```
 
+## 在 Codex 中使用
+
+```text
+$bilireader 请帮我安装运行时并总结这个视频：https://www.bilibili.com/video/BV...
+```
+
+或：
+
+```text
+$bilireader 使用本地 BiliReader 总结 /path/to/video.mp4
+```
+
 ## API 使用方式与功效
 
 后端默认地址：
@@ -137,8 +166,13 @@ curl http://127.0.0.1:8787/api/tasks/<task_id>/transcript
 
 ## 常见问题
 
+- Codex 没识别 Skill：重启 Codex 或新开会话；确认文件存在于 `~/.codex/skills/BiliReader/SKILL.md`。
+- 没有 `python` 命令：改用 `python3 ~/.codex/skills/BiliReader/scripts/bilireader.py ...`。
+- GitHub 访问失败：确认能访问 `https://github.com/fool123/BiliReader_CodexSkill.git`，必要时配置代理。
 - 首次运行 faster-whisper 会下载模型，耗时取决于网络。
 - 真实在线视频需要当前设备能访问目标网站。
 - Bilibili 链接如遇 412、登录限制或风控，可配置 `BILIREADER_BILIBILI_COOKIE` 或 `BILIREADER_BILIBILI_COOKIE_FILE`。
+- 端口 `8787` 被占用：设置 `BILIREADER_PORT=8788` 后重新启动 `serve`。
+- 未配置 API Key 时摘要会比较基础；配置 `OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_MODEL` 可启用 OpenAI-compatible 总结。
 - 不做全局 pip/npm 安装，依赖都安装在运行时仓库的 `.venv`；后端会通过 `imageio-ffmpeg` 提供项目级 ffmpeg。
 - 后端路径模式只允许项目目录内媒体文件；任意本地文件请用 CLI 上传方式。

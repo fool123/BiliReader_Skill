@@ -181,3 +181,15 @@
 - 动作：提交并尝试推送 Bilibili 修复。
 - 结果：已创建提交 `95d9ffb Fix Bilibili audio fallback and cert handling`；`git push origin main` 仍因本机 GitHub HTTPS 凭据不可用失败。
 - 下一步：用户通过 GitHub Desktop 或配置 Git 凭据推送该提交后，知识库项目再更新 runtime。
+
+### 2026-07-04 14:41:21 CST
+
+- 动作：补充 BiliReader GitHub README 的跨设备安装与使用说明。
+- 结果：中文和英文 README 已增加其他个人电脑安装步骤、Codex 中 `$bilireader` 调用示例，以及 Skill 识别、Python 命令、GitHub 访问、端口占用、API Key、Bilibili Cookie 等常见问题。
+- 下一步：提交并推送 README 更新。
+
+### 2026-07-04 14:42:16 CST
+
+- 动作：提交 README 跨设备安装说明并尝试推送。
+- 结果：已创建提交 `8ea3b1e Document cross-device BiliReader setup`；命令行 `git push origin main` 仍因本机 GitHub HTTPS 凭据不可用失败。
+- 下一步：用户通过 GitHub Desktop 推送当前本地提交。

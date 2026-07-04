@@ -15,6 +15,23 @@ BiliReader is a cross-device Codex skill for video analysis. It installs a local
 
 ## Installation
 
+### Install on Another Computer
+
+```bash
+git clone https://github.com/fool123/BiliReader_CodexSkill.git
+cd BiliReader_CodexSkill
+mkdir -p ~/.codex/skills
+cp -R skills/BiliReader ~/.codex/skills/BiliReader
+```
+
+Restart Codex or open a new Codex session so the skill can be discovered. Invocation name:
+
+```text
+$bilireader
+```
+
+### Install Runtime
+
 Copy the skill into the Codex skills directory:
 
 ```bash
@@ -83,6 +100,18 @@ python ~/.codex/skills/BiliReader/scripts/bilireader.py note <task_id>
 python ~/.codex/skills/BiliReader/scripts/bilireader.py transcript <task_id>
 ```
 
+## Use in Codex
+
+```text
+$bilireader Install the runtime and summarize this video: https://www.bilibili.com/video/BV...
+```
+
+Or:
+
+```text
+$bilireader Use local BiliReader to summarize /path/to/video.mp4
+```
+
 ## API Usage and Effects
 
 Default backend URL:
@@ -137,8 +166,13 @@ Effect: returns JSON with `task_id`, `language`, `full_text`, and timestamped `s
 
 ## FAQ
 
+- Codex does not detect the skill: restart Codex or open a new session; confirm `~/.codex/skills/BiliReader/SKILL.md` exists.
+- No `python` command: use `python3 ~/.codex/skills/BiliReader/scripts/bilireader.py ...`.
+- GitHub access fails: verify access to `https://github.com/fool123/BiliReader_CodexSkill.git`, and configure a proxy if needed.
 - The first faster-whisper run may download a model.
 - Online videos require network access to the target website.
 - For Bilibili 412, login-only videos, or anti-bot failures, set `BILIREADER_BILIBILI_COOKIE` or `BILIREADER_BILIBILI_COOKIE_FILE`.
+- Port `8787` is already in use: set `BILIREADER_PORT=8788` and start `serve` again.
+- Without an API key, notes are basic; set `OPENAI_API_KEY`, `OPENAI_BASE_URL`, and `OPENAI_MODEL` to enable OpenAI-compatible summarization.
 - Dependencies are installed into the runtime repo `.venv`, not globally; the backend uses `imageio-ffmpeg` for a project-level ffmpeg binary.
 - Backend path mode only accepts project-local media paths; use CLI upload for arbitrary local files.
